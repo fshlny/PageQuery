@@ -23,9 +23,9 @@ public class StudentSearchHelper {
 		ArrayList<Student> students = new ArrayList<Student>();
 		for (Entry<Integer,Student> st : studentMap.entrySet()) {
 			if(!TextUtils.isEmpty(st.getValue().getSimplePY()))//拼音首字母检索
-				indexStudentSearch.add(new StudentSearchIndex(i, st.getValue().getSimplePY()));
+				indexStudentSearch.add(new StudentSearchIndex(i, st.getValue().getSimplePY().toLowerCase()));
 			if(!TextUtils.isEmpty(st.getValue().getName()))//名字检索
-				indexStudentSearch.add(new StudentSearchIndex(i, st.getValue().getName()));
+				indexStudentSearch.add(new StudentSearchIndex(i, st.getValue().getName().toLowerCase()));
 			i++;
 			students.add(st.getValue());
 		}
@@ -40,16 +40,16 @@ public class StudentSearchHelper {
 	 * @return SearchReply
 	 */
 	public SearchReply searchStudent(SearchRequest request){
-		if(0 >= request.getPage()){
+		if(0 >= request.getPageAmount()){
 			return new SearchReply(request.getPage(), request.getPageAmount(), 0, new ArrayList<Student>());
 		}
 		List<StudentSearchIndex> searchIndexs = studentIndexs;
 		
 		int totalStudent = 0;//检索结果总数量
 		//检索结果的开始值
-		int searchStudentStartIndex = Collections.binarySearch(searchIndexs, new StudentSearchIndex(Integer.MIN_VALUE, request.getKey()));
+		int searchStudentStartIndex = Collections.binarySearch(searchIndexs, new StudentSearchIndex(Integer.MIN_VALUE, request.getKey().toLowerCase()));
 		// "\uFFFF"是Unicode码的最后一个数值
-		totalStudent = Collections.binarySearch(searchIndexs, new StudentSearchIndex(Integer.MAX_VALUE, request.getKey()+"\uFFFF"));
+		totalStudent = Collections.binarySearch(searchIndexs, new StudentSearchIndex(Integer.MAX_VALUE, request.getKey().toLowerCase()+"\uFFFF"));
 		
 		//获取在索引列表中的索引值,获取在数据列表中的索引值
 		if(searchStudentStartIndex < 0)
@@ -68,10 +68,10 @@ public class StudentSearchHelper {
 		
 		TreeMap<Integer,Integer> studentMap = new TreeMap<Integer, Integer>();
 		
-		for(int i=searchStudentStartIndex;i<totalStudent;i++){
+		for(int i=searchStudentStartIndex;i<=totalStudent;i++){
 			int index = searchIndexs.get(i).getIndex();
 			if(index < studentList.size())
-				studentMap.put(studentList.get(i).getId(), index);
+				studentMap.put(studentList.get(index).getId(), index);
 		}
 		
 		int startIndex = request.getPage() * request.getPageAmount();
@@ -80,8 +80,20 @@ public class StudentSearchHelper {
 		int ii=0;
 		for(Entry<Integer, Integer> entry:studentMap.entrySet()){
 			//TODO 将数据添加到响应中
+			if(ii < startIndex){
+				ii++;
+				continue;
+			}else if(ii<endIndex){
+				//获取到对应的结果
+				replyStudents.add(studentList.get(entry.getValue()));
+			}else{
+				break;
+			}
 		}
 		
-		return null;
+		int totalPageSize = (studentMap.size() % request.getPageAmount()) == 0 ? 
+				(studentMap.size()/request.getPageAmount()) : (studentMap.size()/request.getPageAmount()+1);
+		
+		return new SearchReply(request.getPage()+1,request.getPageAmount(),totalPageSize,replyStudents);
 	}
 }

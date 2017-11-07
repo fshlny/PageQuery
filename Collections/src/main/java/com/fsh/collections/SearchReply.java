@@ -61,11 +61,23 @@ public class SearchReply {
 		this.result = result;
 	}
 	
+	
+	
 	@Override
 	public String toString() {
-		return "SearchReply [page=" + page + ", pageAmount=" + pageAmount + ", totalPage=" + totalPage + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("[page=" + page+",");
+		sb.append(" pageAmount=" + pageAmount+",");
+		sb.append(" totalPage=" + totalPage+",");
+		sb.append(" [");
+		for (Student student : result) {
+			sb.append("{id:"+student.getId()+",");
+			sb.append("name:"+student.getName()+",");
+			sb.append("SimplePY:"+student.getSimplePY()+"},");
+		}
+		sb.append("]]");
+		return sb.toString();
 	}
-	
 	public SearchReply(int page, int pageAmount, int totalPage, List<Student> result) {
 		this.page = page;
 		this.pageAmount = pageAmount;
