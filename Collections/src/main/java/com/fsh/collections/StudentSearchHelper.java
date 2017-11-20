@@ -49,7 +49,7 @@ public class StudentSearchHelper {
 		//检索结果的开始值
 		int searchStudentStartIndex = Collections.binarySearch(searchIndexs, new StudentSearchIndex(Integer.MIN_VALUE, request.getKey().toLowerCase()));
 		// "\uFFFF"是Unicode码的最后一个数值
-		totalStudent = Collections.binarySearch(searchIndexs, new StudentSearchIndex(Integer.MAX_VALUE, request.getKey().toLowerCase()+"\uFFFF"));
+		totalStudent = Collections.binarySearch(searchIndexs, new StudentSearchIndex(Integer.MAX_VALUE, request.getKey().toLowerCase()+'\uFFFF'));
 		
 		//获取在索引列表中的索引值,获取在数据列表中的索引值
 		if(searchStudentStartIndex < 0)
@@ -68,7 +68,7 @@ public class StudentSearchHelper {
 		
 		TreeMap<Integer,Integer> studentMap = new TreeMap<Integer, Integer>();
 		
-		for(int i=searchStudentStartIndex;i<=totalStudent;i++){
+		for(int i=searchStudentStartIndex;i<totalStudent;i++){
 			int index = searchIndexs.get(i).getIndex();
 			if(index < studentList.size())
 				studentMap.put(studentList.get(index).getId(), index);

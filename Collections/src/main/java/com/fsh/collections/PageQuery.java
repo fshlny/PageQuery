@@ -28,7 +28,7 @@ public class PageQuery {
 	//{1=0, 3=2, 5=4, 8=7, 9=8}
 	public static void main(String[] args) {
 		StudentSearchHelper helper = new StudentSearchHelper(studentMap);
-		SearchRequest request = new SearchRequest("H", 0, 20);
+		SearchRequest request = new SearchRequest("H", 0, 10);
 		SearchReply reply = helper.searchStudent(request);
 		System.out.println(reply.toString());
 	}
